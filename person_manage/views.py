@@ -26,6 +26,8 @@ class PersonView(APIView):
     def post(self,request):
         post_user = api.post_person_data(request)
         return Response({
+
+        
         "success": "{}, активируйте аккаунт на указанной вами почте ".format(post_user)
         })
 
