@@ -32,7 +32,7 @@ ALLOWED_HOSTS = settings_local.ALLOWED_HOSTS
 # Application definition
 SITE_ID = 1
 INSTALLED_APPS = [
-    'person_manag',
+    'person_manage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -85,7 +85,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'wk_test_api.wsgi.application'
 
-AUTH_USER_MODEL = 'person_manag.CustomUser'
+AUTH_USER_MODEL = 'person_manage.CustomUser'
 
 
 #Email settings

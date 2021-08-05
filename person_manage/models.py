@@ -33,7 +33,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     token_data = models.CharField(max_length=255,blank=True)
     activate_code = models.CharField(max_length=255,blank=True)
-    person_group = ForeignKey(GroupPerson, on_delete=CASCADE)
+    person_group = ForeignKey(GroupPerson, on_delete=CASCADE, default="1")
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
