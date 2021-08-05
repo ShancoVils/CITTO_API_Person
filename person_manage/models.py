@@ -16,6 +16,8 @@ OFFICIAL_LIST =(
 
 class GroupPerson(models.Model):
     Name_Group = models.CharField(max_length=30, blank=True)
+    data_created = models.DateTimeField(default=timezone.now)
+    data_update = models.DateTimeField( auto_now=True)
     
 
     def __str__(self):
