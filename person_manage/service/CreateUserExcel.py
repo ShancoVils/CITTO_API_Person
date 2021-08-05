@@ -6,7 +6,7 @@ import os,xlrd
 class CreateUserExcel():
     def __init__(self, request):
         # Получаю файл
-        excel_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),'excel_file/teams.xls')
+        excel_file_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))),'generated_files/excel/teams.xls')
         excel_dict = {}
         excel_file = xlrd.open_workbook(excel_file_path)
         excel_sheet = excel_file.sheet_by_index(0)

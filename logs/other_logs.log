@@ -259,3 +259,27 @@ fgjdgkhdgk2021-08-05 16:17:55,486 - person_logger - DEBUG - Данные получены
 2021-08-05 16:39:16,413 - person_logger - DEBUG - Пользователю  на 'megalaniya@mail.ru' был выдан токен  
 2021-08-05 16:39:16,453 - person_logger - DEBUG - Пользователю  на 'None' был выдан токен  
 2021-08-05 16:39:16,453 - person_logger - DEBUG - Пользователь 'megalaniya@mail.ru' создан (не активирован)
+2021-08-05 16:39:19,349 - person_logger - DEBUG - Данные получены
+2021-08-05 17:08:18,989 - person_logger - DEBUG - Пользователю  на 'pernens@mail.ru' был выдан токен  
+2021-08-05 17:08:48,061 - person_logger - DEBUG - Пользователю  на 'pernens@mail.ru' был выдан токен  
+2021-08-05 17:50:12,935 - person_logger - DEBUG - Данные получены
+2021-08-05 17:50:29,195 - person_logger - ERROR - Токен 'e01faab84d691477132ee6e5540e3c4156b40d74' не существует
+2021-08-05 17:50:52,008 - person_logger - DEBUG - Пользователю  на 'pernens@mail.ru' был выдан токен  
+2021-08-05 17:50:52,010 - person_logger - DEBUG - Профиль пользователя 'pernens@mail.ru' обновлен
+2021-08-05 17:50:55,336 - person_logger - DEBUG - Данные получены
+2021-08-05 17:51:10,342 - person_logger - ERROR - Почты 'megalaniya@mail.ru' не существует 
+2021-08-05 17:51:36,514 - person_logger - DEBUG - Письмо подтверждение отправлено на 'megalaniya@mail.ru' 
+2021-08-05 17:51:36,790 - person_logger - DEBUG - Пользователю  на 'megalaniya@mail.ru' был выдан токен  
+2021-08-05 17:51:36,822 - person_logger - DEBUG - Пользователю  на 'None' был выдан токен  
+2021-08-05 17:51:36,824 - person_logger - DEBUG - Пользователь 'megalaniya@mail.ru' создан (не активирован)
+2021-08-05 17:51:46,320 - person_logger - DEBUG - Пользователю  на 'megalaniya@mail.ru' был выдан токен  
+2021-08-05 17:51:46,321 - person_logger - DEBUG - Пользователь 'megalaniya@mail.ru'активирован
+2021-08-05 17:51:50,524 - person_logger - DEBUG - Данные получены
+2021-08-05 17:53:54,660 - person_logger - DEBUG - Данные получены
+2021-08-05 17:55:26,447 - person_logger - DEBUG - Профиль пользователя 'megalaniya@mail.ru' удален
+2021-08-05 17:56:57,514 - person_logger - DEBUG - Данные получены
+2021-08-05 18:03:40,309 - person_logger - DEBUG - Пользователю  на 'fsfwvmub@mail.ru' был выдан токен  
+2021-08-05 18:03:40,366 - person_logger - DEBUG - Пользователю  на 'fsfwvmub@mail.ru' был выдан токен  
+2021-08-05 18:03:40,689 - person_logger - DEBUG - Пользователю  на 'upaktbph@mail.ru' был выдан токен  
+2021-08-05 18:03:40,693 - person_logger - DEBUG - Пользователю  на 'upaktbph@mail.ru' был выдан токен  
+2021-08-05 18:03:40,884 - person_logger - DEBUG - Пользователю  на 'rulegidk@mail.ru' был выдан токен  

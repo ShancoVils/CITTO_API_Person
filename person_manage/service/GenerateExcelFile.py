@@ -32,7 +32,7 @@ class GenerateExcelFile():
         generate_random_password(quantity)
         generate_random_group_id(quantity)
         df = pd.DataFrame(account_dict) 
-        df.to_excel('excel_file/teams.xls')
+        df.to_excel('generated_files/excel/teams.xls')
 
 
         
