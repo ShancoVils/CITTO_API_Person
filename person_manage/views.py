@@ -51,7 +51,7 @@ class PersonView(APIView):
 
 def generate_users(request):
     CreateUserExcel(request)
-    return HttpResponse("Пользователи добавлены")
+    return HttpResponse("Пользователи добавлены в бд")
 
 #Считывает указанный excel файл, и добавляет записи в бд
 quantity =  5
