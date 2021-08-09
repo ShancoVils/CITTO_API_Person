@@ -22,10 +22,8 @@ class GroupPerson(models.Model):
     class Meta:
         verbose_name_plural = "Отделы"
     
-
     def __str__(self):
         return self.Name_Group
-
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('Фамилия'),max_length=30,blank=True)
@@ -41,15 +39,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     token_data = models.CharField(_('Токен'),max_length=255,blank=True)
     activate_code = models.CharField(_('Код активации'),max_length=255,blank=True)
     person_group = ForeignKey(GroupPerson, on_delete=CASCADE, verbose_name="Отдел")
+    fio = models.CharField(_('Токен'),max_length=255, blank=True)
+
+    def save(self, force_insert=False, force_update=False, using=None,
+         update_fields=None):
+        if not self.fio:
+           self.fio = f"{self.first_name} {self.last_name}  {self.namej}"
+        return super(CustomUser, self).save()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-
-    def fio(self):
-        fio_field = f"{self.first_name} {self.last_name}  {self.namej}"
-        return fio_field
-        
     class Meta:
         verbose_name_plural = "Пользователи"
 
