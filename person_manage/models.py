@@ -2,10 +2,10 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db.models.deletion import CASCADE
+from django.db.models.fields import CharField
 from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
-from .managers import CustomUserManager
 
 OFFICIAL_LIST =(
     ("1", "Уборщик"),
@@ -55,4 +55,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 
-   
+class QuestionsPull(models.Model):
+    question = CharField(_('Вопрос'),max_length=255)
+    answer = CharField(_('Ответ'),max_length=30,)
+    data_created = models.DateTimeField(_('Дата создания'),default=timezone.now)
+    data_update = models.DateTimeField(_('Дата обновления'), auto_now=True)
+    factor = models.IntegerField(_('Коэффициент'),)
+    class Meta:
+            verbose_name_plural = "Вопросы"

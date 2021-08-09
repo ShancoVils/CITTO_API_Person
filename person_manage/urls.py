@@ -1,6 +1,6 @@
 from .import views
 from django.urls import path
-from .views import PersonView, generate_excel_file,activate_user
+from .views import PersonView, generate_excel_file,activate_user,api_get_questions,api_post_answers,test_algoritm
 
 
 urlpatterns = [
@@ -14,4 +14,9 @@ urlpatterns = [
     path('confirm_form/<slug:random_code>/',activate_user),
     #Генерирует excel файл
     path('generate_excel_file/', generate_excel_file),
+    #Генерация вопросов 
+    path('generate_questions/', api_get_questions),
+    #Отправка ответов
+    path('post_answers/', api_post_answers),
+    path('test/', test_algoritm),
 ]

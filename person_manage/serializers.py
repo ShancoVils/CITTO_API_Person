@@ -8,7 +8,7 @@ class CustomUserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only = True)
     email = serializers.CharField(max_length=120)
     fio = serializers.CharField()
-    Official = serializers.CharField()
+    official = serializers.CharField()
     person_group_id = serializers.IntegerField()
     activate_code = serializers.CharField(write_only=True)
     person_group = serializers.StringRelatedField()
@@ -27,3 +27,12 @@ class CustomUserSerializer(serializers.Serializer):
         instance.person_group_id = validated_data.get('person_group_id', instance.person_group_id)
         instance.save()
         return instance
+
+
+
+
+class GenerateQuestionSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    question = serializers.CharField(max_length=120)
+    answer = serializers.CharField()
+    factor = serializers.IntegerField()
