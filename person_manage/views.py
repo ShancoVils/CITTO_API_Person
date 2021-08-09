@@ -1,13 +1,15 @@
 from requests.api import request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view, renderer_classes
 from django.http import HttpResponse
 from rest_framework.response import Response
 from .service.CreateUserExcel import CreateUserExcel
 from .service.GenerateExcelFile import GenerateExcelFile
 from .service.PersonApiFunctional import PersonView as api
 from .service.UserAutentificate import ActivateCodeForm
-
+from .service.GenerateQuestions import GenerateQuestions
+from .models import QuestionsPull, CustomUser
 '''
 Класс реализует основной функционал API и стандартные методы GET,PUT, POST, DELETE
 
@@ -66,3 +68,27 @@ def activate_user(request, random_code):
     ActivateCodeForm(random_code)
     return HttpResponse("Пользователь акивирован")
 
+
+
+
+@api_view(['GET'])
+def api_get_questions(self):
+    question_pull =  GenerateQuestions.get_question()
+    return Response({"Вопросы": question_pull})
+
+
+@api_view(['POST'])
+def api_post_answers(request):
+    answers_pull =  GenerateQuestions.post_answer(request)
+    return Response({"Ответы": answers_pull})
+
+
+def test_algoritm(request):
+    qs = QuestionsPull.objects.filter(id = 1)
+    qs_jj = qs.values()
+    one_obj = qs_jj.values()
+    list_test = []
+    
+    # yz =qs_factor[1].values()
+    # j = int(gg)+int(yz)
+    return HttpResponse(one_obj.factor)

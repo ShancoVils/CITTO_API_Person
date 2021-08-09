@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, GroupPerson
+from .models import CustomUser, GroupPerson,QuestionsPull
 
 class ActiveteUserFilter(admin.SimpleListFilter):
     title = ('Активирован')
@@ -36,5 +37,19 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email','first_name','official','is_staff', 'is_active','person_group')
     read_only = ('email','fio')
 
+class TestQuestionsAdmin(ModelAdmin):
+    model = QuestionsPull
+    list_display = ('question','answer','factor','data_created','data_update',)
+    fieldsets = (
+        (None, {'fields': ('question','answer','factor',)}),
+    )
+
+    search_fields = ('question','factor',)
+    ordering = ('question','data_created','factor',)
+    read_only = ('data_created','data_update')
+
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(GroupPerson)
+admin.site.register(QuestionsPull,TestQuestionsAdmin)
