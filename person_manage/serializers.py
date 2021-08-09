@@ -20,7 +20,9 @@ class CustomUserSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         instance.email = validated_data.get('email', instance.email)
-        instance.fio = validated_data.get('fio', instance.fio)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.name = validated_data.get('name', instance.name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.Official = validated_data.get('Official', instance.Official)
         instance.person_group_id = validated_data.get('person_group_id', instance.person_group_id)
         instance.save()

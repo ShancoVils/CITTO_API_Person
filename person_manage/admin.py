@@ -3,24 +3,29 @@ from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser, GroupPerson
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ('email','fio','Official','is_staff', 'is_active','activate_code','person_group')
-    list_filter = ('email', 'is_staff', 'is_active','activate_code','person_group')
+    list_display = ('email','fio','official','is_staff', 'is_active','person_group',)
+    list_filter = ('email',)
     fieldsets = (
-        (None, {'fields': ('email','fio','Official','password','activate_code','person_group')}),
+        (None, {'fields': ('email','fio','last_name','namej','first_name','official','password','activate_code','person_group')}),
         ('Permissions', {'fields': ('is_staff', 'is_active')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email','fio','Official', 'password1', 'password2', 'is_staff', 'is_active','person_group')}
+            'fields': ('email','last_name','namej','first_name','official', 'password1', 'password2', 'is_staff', 'is_active','person_group')}
         ),
     )
-    search_fields = ('email','name',)
-    ordering = ('email','name',)
+    search_fields = ('email',)
+    ordering = ('email','first_name','official','is_staff', 'is_active','person_group')
+    read_only = ('email','fio')
+
+    def fio(self, obj):
+        return obj.fio()
+
+
+
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
 
-
-
-@admin.register(GroupPerson)
-class GroupPerson(admin.ModelAdmin):
-    list_display = ['id', 'Name_Group']
+admin.site.register(GroupPerson)
