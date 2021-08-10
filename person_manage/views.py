@@ -9,7 +9,9 @@ from .service.GenerateExcelFile import GenerateExcelFile
 from .service.PersonApiFunctional import PersonView as api
 from .service.UserAutentificate import ActivateCodeForm
 from .service.GenerateQuestions import GenerateQuestions
-from .models import QuestionsPull, CustomUser
+from .models import QuestionsPull, CustomUser, GroupPerson
+import itertools
+import numpy 
 '''
 Класс реализует основной функционал API и стандартные методы GET,PUT, POST, DELETE
 
@@ -72,23 +74,20 @@ def activate_user(request, random_code):
 
 
 @api_view(['GET'])
-def api_get_questions(self):
-    question_pull =  GenerateQuestions.get_question()
+def api_get_questions(request):
+    question_pull =  GenerateQuestions.get_question(request)
     return Response({"Вопросы": question_pull})
 
 
 @api_view(['POST'])
 def api_post_answers(request):
     answers_pull =  GenerateQuestions.post_answer(request)
-    return Response({"Ответы": answers_pull})
+    return Response({"Ваш результат": answers_pull})
 
 
 def test_algoritm(request):
-    qs = QuestionsPull.objects.filter(id = 1)
-    qs_jj = qs.values()
-    one_obj = qs_jj.values()
-    list_test = []
-    
-    # yz =qs_factor[1].values()
-    # j = int(gg)+int(yz)
-    return HttpResponse(one_obj.factor)
+    user_data = CustomUser.objects.get(id=12)
+    group_info = GroupPerson.objects.filter(Name_Group = user_data.person_group)
+    group_factor = group_info.values()
+    max_factor_group = group_factor[0]['max_test_factor']
+    return HttpResponse(max_factor_group)

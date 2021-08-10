@@ -1,7 +1,7 @@
 from os import write
 from django.utils.functional import empty
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser,TestResults
 
 
 class CustomUserSerializer(serializers.Serializer):
@@ -28,11 +28,16 @@ class CustomUserSerializer(serializers.Serializer):
         instance.save()
         return instance
 
-
-
-
 class GenerateQuestionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     question = serializers.CharField(max_length=120)
     answer = serializers.CharField()
-    factor = serializers.IntegerField()
+    factor = serializers.FloatField()
+
+class TestResult(serializers.Serializer):
+    test_result = serializers.FloatField()
+    test_mark = serializers.CharField()
+    tested_user_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        return TestResults.objects.create(**validated_data)
