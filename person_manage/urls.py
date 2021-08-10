@@ -4,7 +4,7 @@ from .views import PersonView, generate_excel_file,activate_user,api_get_questio
 
 
 urlpatterns = [
-    # Получить данные 
+    # Получить данные '
     path('person/', PersonView.as_view()), 
     # Put запрос 
     path('person/<int:pk>', PersonView.as_view()),

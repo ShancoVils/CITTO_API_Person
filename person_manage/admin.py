@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, GroupPerson,QuestionsPull
+from .models import CustomUser, GroupPerson,QuestionsPull,TestResults
 
 class ActiveteUserFilter(admin.SimpleListFilter):
     title = ('Активирован')
@@ -50,6 +50,30 @@ class TestQuestionsAdmin(ModelAdmin):
 
 
 
+
+class GroupAdmin(ModelAdmin):
+    model = GroupPerson
+    list_display = ('Name_Group','max_test_factor','pass_test_factor')
+    fieldsets = (
+        (None, {'fields': ('Name_Group','max_test_factor','pass_test_factor')}),
+    )
+
+    search_fields = ('Name_Group',)
+    ordering = ('Name_Group','max_test_factor','pass_test_factor')
+    read_only = ('data_created','data_update')
+
+
+
+class TestingAdmin(ModelAdmin):
+    model = TestResults
+    list_display = ('tested_user','test_result','test_mark')
+    search_fields = ('tested_user',)
+    ordering = ('tested_user','test_result','test_mark')
+    read_only = ('tested_user','test_result','test_mark')
+
+
+
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(GroupPerson)
+admin.site.register(GroupPerson, GroupAdmin)
 admin.site.register(QuestionsPull,TestQuestionsAdmin)
+admin.site.register(TestResults,TestingAdmin)

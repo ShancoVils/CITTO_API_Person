@@ -11,11 +11,17 @@ OFFICIAL_LIST =(
     ("1", "Уборщик"),
     ("2", "Охранник"),
     ("3", "Кассир"),
+    ("4", "Разработчик"),
+    ("5", "Оператор"),
+    ("6", "Директор"),
+
 )
 
 
 class GroupPerson(models.Model):
     Name_Group = models.CharField(_('Название отдела'),max_length=30, blank=True)
+    max_test_factor = models.FloatField(_('Максимальный коэффициент'),max_length=10, blank=True)
+    pass_test_factor = models.FloatField(_('Проходной коэффициент'),max_length=10, blank=True)
     data_created = models.DateTimeField(_('Дата создания'),default=timezone.now)
     data_update = models.DateTimeField(_('Дата обновления'), auto_now=True)
 
@@ -56,10 +62,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class QuestionsPull(models.Model):
-    question = CharField(_('Вопрос'),max_length=255)
-    answer = CharField(_('Ответ'),max_length=30,)
+    question = models.CharField(_('Вопрос'),max_length=255)
+    answer = models.CharField(_('Ответ'),max_length=30,)
     data_created = models.DateTimeField(_('Дата создания'),default=timezone.now)
     data_update = models.DateTimeField(_('Дата обновления'), auto_now=True)
-    factor = models.IntegerField(_('Коэффициент'),)
+    factor = models.FloatField(_('Коэффициент'),)
     class Meta:
             verbose_name_plural = "Вопросы"
+
+
+class TestResults(models.Model):
+    tested_user = models.ForeignKey(CustomUser, on_delete=CASCADE, verbose_name="Пользователь")
+    test_result = models.FloatField(_('Результат'),)
+    test_mark = models.CharField(_('Оценка'),max_length=15, default="gg")
+    class Meta:
+            verbose_name_plural = "Тестирование"
