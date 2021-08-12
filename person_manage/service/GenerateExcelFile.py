@@ -1,9 +1,11 @@
 import random,string,re,os
 from random import randint
 import pandas as pd
-# Метод генерирующий excel файл
+'''
 
+Класс генерирует exel файл со случайными email и отделом
 
+'''
 class GenerateExcelFile():
     def __init__(self,request,quantity):
         account_dict = {}   

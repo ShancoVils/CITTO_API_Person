@@ -1,7 +1,6 @@
-from requests.api import request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view
 from django.http import HttpResponse
 from rest_framework.response import Response
 from .service.CreateUserExcel import CreateUserExcel
@@ -9,9 +8,7 @@ from .service.GenerateExcelFile import GenerateExcelFile
 from .service.PersonApiFunctional import PersonView as api
 from .service.UserAutentificate import ActivateCodeForm
 from .service.GenerateQuestions import GenerateQuestions
-from .models import QuestionsPull, CustomUser, GroupPerson
-import itertools
-import numpy 
+
 '''
 Класс реализует основной функционал API и стандартные методы GET,PUT, POST, DELETE
 
@@ -70,24 +67,34 @@ def activate_user(request, random_code):
     ActivateCodeForm(random_code)
     return HttpResponse("Пользователь акивирован")
 
-
-
+# Метод получает пулл вопросов. Сложность и количество вопросов зависят от должности
 
 @api_view(['GET'])
 def api_get_questions(request):
     question_pull =  GenerateQuestions.get_question(request)
     return Response({"Вопросы": question_pull})
 
+# Метод отправляет на проверку ответы, которые ввел пользователь, и выдает результат
 
 @api_view(['POST'])
 def api_post_answers(request):
     answers_pull =  GenerateQuestions.post_answer(request)
     return Response({"Ваш результат": answers_pull})
 
+'''
+Метод получает всех данные всех пользователей прошедших тест,
+а так же детальный результат (доступно только администратору)
 
-def test_algoritm(request):
-    user_data = CustomUser.objects.get(id=12)
-    group_info = GroupPerson.objects.filter(Name_Group = user_data.person_group)
-    group_factor = group_info.values()
-    max_factor_group = group_factor[0]['max_test_factor']
-    return HttpResponse(max_factor_group)
+'''
+@api_view(['GET'])
+def api_get_results(request):
+    results_data =  GenerateQuestions.get_result(request)
+    return Response({"Результаты": results_data})
+
+# Метод получает почту того, кто лучше всего прошел тест
+
+@api_view(['GET'])
+def get_winner(request):
+    results_data =  GenerateQuestions.get_winner(request)
+    return Response({"Победитель": results_data})
+

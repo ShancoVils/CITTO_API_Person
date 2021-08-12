@@ -3,22 +3,27 @@ import itertools
 from random import randint
 from itertools import chain
 
+'''
 
+Класс генерирует пулл вопросов, в зависимости от отдела пользователя,
+который будет его проходить. Количество и максимальный возможный балл 
+определяет переменная max_factor
 
+'''
 class GenerateQuestionsSet():
     def get_question_set(request, max_factor):
-            qs = QuestionsPull.objects.all()
-            qs_jj = qs.values()
+            quest_pull = QuestionsPull.objects.all()
+            quest_pull = quest_pull.values()
             list_test = []
             schetchik = 0
-            for i in range(len(qs)):
-                ff = qs_jj[schetchik]['factor']
+            for i in range(len(quest_pull)):
+                ff = quest_pull[schetchik]['factor']
                 list_test.append(ff)
                 schetchik = schetchik+1
             print(list_test)
             list_true_char = []
             iteration = 0
-            for item in  range(len(qs)):
+            for item in  range(len(quest_pull)):
                 results = itertools.combinations(list_test, iteration)
                 for item in results:
                     if sum(item)==max_factor:
