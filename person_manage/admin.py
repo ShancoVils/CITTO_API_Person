@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, GroupPerson,QuestionsPull,TestResults
+from .models import CustomUser, GroupPerson,QuestionsPull,TestResults,DetailedTestResult
 
 class ActiveteUserFilter(admin.SimpleListFilter):
     title = ('Активирован')
@@ -18,6 +18,8 @@ class ActiveteUserFilter(admin.SimpleListFilter):
 
         if self.value() == 'is_active_false':
                     return queryset.filter(is_active=False)
+
+# Форма для админ-панели отображающая модель "Пользователи"
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
@@ -37,19 +39,20 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email','first_name','official','is_staff', 'is_active','person_group')
     read_only = ('email','fio')
 
+# Форма для админ-панели отображающая модель "Вопросы"
+
 class TestQuestionsAdmin(ModelAdmin):
     model = QuestionsPull
     list_display = ('question','answer','factor','data_created','data_update',)
     fieldsets = (
         (None, {'fields': ('question','answer','factor',)}),
     )
-
     search_fields = ('question','factor',)
     ordering = ('question','data_created','factor',)
     read_only = ('data_created','data_update')
 
 
-
+# Форма для админ-панели отображающая модель "Отделы"
 
 class GroupAdmin(ModelAdmin):
     model = GroupPerson
@@ -57,12 +60,11 @@ class GroupAdmin(ModelAdmin):
     fieldsets = (
         (None, {'fields': ('Name_Group','max_test_factor','pass_test_factor')}),
     )
-
     search_fields = ('Name_Group',)
     ordering = ('Name_Group','max_test_factor','pass_test_factor')
     read_only = ('data_created','data_update')
 
-
+# Форма для админ-панели отображающая модель "Результаты тестирования"
 
 class TestingAdmin(ModelAdmin):
     model = TestResults
@@ -73,7 +75,20 @@ class TestingAdmin(ModelAdmin):
 
 
 
+# Форма для админ-панели отображающая модель "Детальные результаты тестирования"
+
+class DetailedTestResultAdmin(ModelAdmin):
+    model = DetailedTestResult
+    list_display = ('test_number','question','factor','qustion_result')
+    search_fields = ('test_number',)
+    ordering = ('test_number',)
+    read_only = ('test_number','question','qustion_result','factor')
+
+
+# Зарегистрированные модели
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(GroupPerson, GroupAdmin)
 admin.site.register(QuestionsPull,TestQuestionsAdmin)
 admin.site.register(TestResults,TestingAdmin)
+admin.site.register(DetailedTestResult,DetailedTestResultAdmin)

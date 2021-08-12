@@ -1,6 +1,6 @@
 from .import views
 from django.urls import path
-from .views import PersonView, generate_excel_file,activate_user,api_get_questions,api_post_answers,test_algoritm
+from .views import PersonView, generate_excel_file,activate_user,api_get_questions,api_post_answers,get_winner,api_get_results
 
 
 urlpatterns = [
@@ -18,5 +18,8 @@ urlpatterns = [
     path('generate_questions/', api_get_questions),
     #Отправка ответов
     path('post_answers/', api_post_answers),
-    path('test/', test_algoritm),
+    #Получение результатов
+    path('get_results/', api_get_results),
+    #Получение победителя
+    path('get_winner/', get_winner),
 ]
