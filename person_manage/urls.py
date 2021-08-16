@@ -19,6 +19,6 @@ urlpatterns = [
     path('get_winner/', get_winner),
     #Получение вопросов(занесние в бд)
     path('get_and_post_questions/', api_get_and_post_questions),
-    #Получение вопросов(занесние в бд)
+    #Занесение результатов в опросов в бд
     path('put_answer_result/<int:pk>', put_answer_result),
 ]

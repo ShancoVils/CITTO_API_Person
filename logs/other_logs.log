@@ -1477,3 +1477,48 @@ fgjdgkhdgk2021-08-05 16:17:55,486 - person_logger - DEBUG - Данные получены
 2021-08-16 13:13:19,473 - person_logger - DEBUG - Вопросы получены
 2021-08-16 13:14:59,336 - person_logger - DEBUG - Вопросы получены
 2021-08-16 13:16:44,926 - person_logger - DEBUG - Вопросы получены
+2021-08-16 13:17:37,470 - person_logger - DEBUG - Вопросы получены
+2021-08-16 13:33:05,414 - person_logger - DEBUG - Вопросы получены
+2021-08-16 13:34:06,962 - person_logger - DEBUG - Вопросы получены
+2021-08-16 13:34:29,499 - person_logger - DEBUG - Вопросы получены
+2021-08-16 13:34:45,814 - person_logger - DEBUG - Вопросы получены
+2021-08-16 14:11:26,225 - person_logger - DEBUG - Вопросы получены
+2021-08-16 15:22:59,641 - person_logger - DEBUG - Вопросы получены
+2021-08-16 16:12:07,134 - person_logger - DEBUG - Результаты получены
+2021-08-16 16:13:01,972 - person_logger - ERROR - Токен 'e164ab1c3ev19d899b2d62f2ee3515fbae7d6e481' не существует
+2021-08-16 16:13:12,578 - person_logger - DEBUG - Результаты получены
+2021-08-16 16:24:51,449 - person_logger - DEBUG - Результаты получены
+2021-08-16 16:25:05,757 - person_logger - ERROR - Токен 'e164ab1c3e19d899b2d62ff2ee3515fbae7d6e481' не существует
+2021-08-16 16:40:49,026 - person_logger - ERROR - Токен '2f869396dfa524f9e1319961480ee3fa056638ea' не существует
+2021-08-16 16:41:52,268 - person_logger - DEBUG - Результаты получены
+2021-08-16 16:59:39,365 - person_logger - DEBUG - Результаты получены
+2021-08-16 17:04:29,824 - person_logger - DEBUG - Результаты получены
+2021-08-16 17:09:46,711 - person_logger - DEBUG - Результаты получены
+2021-08-16 17:10:06,588 - person_logger - ERROR - Токен '0b027cb20327469e8229e48a4fca5f77bc073c69' не существует
+2021-08-16 17:11:43,993 - person_logger - ERROR - Токен '0b027cb20327469e8229e48a4fca5f77bc073c69' не существует
+2021-08-16 17:14:08,913 - person_logger - DEBUG - Вопросы получены
+2021-08-16 17:14:23,517 - person_logger - DEBUG - Вопросы получены
+2021-08-16 17:28:25,619 - person_logger - DEBUG - Данные получены
+2021-08-16 17:30:16,149 - person_logger - DEBUG - Пользователю  на 'testemail@mail.ru' был выдан токен  
+2021-08-16 17:30:16,149 - person_logger - DEBUG - Профиль пользователя 'testemail@mail.ru' обновлен
+2021-08-16 17:30:20,450 - person_logger - DEBUG - Данные получены
+2021-08-16 17:30:45,982 - person_logger - DEBUG - Пользователю  на 'testemail@mail.ru' был выдан токен  
+2021-08-16 17:30:45,986 - person_logger - DEBUG - Профиль пользователя 'testemail@mail.ru' обновлен
+2021-08-16 17:30:49,509 - person_logger - DEBUG - Данные получены
+2021-08-16 17:32:02,017 - person_logger - DEBUG - Данные получены
+2021-08-16 17:32:32,029 - person_logger - DEBUG - Данные получены
+2021-08-16 17:32:42,994 - person_logger - DEBUG - Данные получены
+2021-08-16 17:33:57,407 - person_logger - DEBUG - Данные получены
+2021-08-16 17:34:46,282 - person_logger - DEBUG - Данные получены
+2021-08-16 17:34:53,398 - person_logger - DEBUG - Пользователю  на 'testemail@mail.ru' был выдан токен  
+2021-08-16 17:34:53,400 - person_logger - DEBUG - Профиль пользователя 'testemail@mail.ru' обновлен
+2021-08-16 17:41:09,026 - person_logger - DEBUG - Данные получены
+2021-08-16 17:46:30,960 - person_logger - DEBUG - Данные получены
+2021-08-16 17:47:54,936 - person_logger - DEBUG - Письмо подтверждение отправлено на 'megalaniya@mail.ru' 
+2021-08-16 17:48:19,478 - person_logger - DEBUG - Письмо подтверждение отправлено на 'megalaniya@mail.ru' 
+2021-08-16 17:48:19,879 - person_logger - DEBUG - Пользователю  на 'megalaniya@mail.ru' был выдан токен  
+2021-08-16 17:48:19,928 - person_logger - DEBUG - Пользователю  на 'None' был выдан токен  
+2021-08-16 17:48:19,932 - person_logger - DEBUG - Пользователь 'megalaniya@mail.ru' создан (не активирован)
+2021-08-16 17:48:23,056 - person_logger - DEBUG - Данные получены
+2021-08-16 17:50:49,117 - person_logger - DEBUG - Данные получены
+2021-08-16 17:54:38,870 - person_logger - DEBUG - Письмо подтверждение отправлено на 'megalaniya@mail.ru' 

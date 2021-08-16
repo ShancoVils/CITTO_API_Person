@@ -1,15 +1,12 @@
 from os import times
 from ..models import GroupPerson, QuestionsPull, CustomUser, TestResults
 from .GenerateQuestionSet import GenerateQuestionsSet as gqs
-from rest_framework.authtoken.models import Token
 from .Hepler_class import Helper as help
 from ..logs import logger
 from rest_framework.views import APIView
 import requests, datetime
-from django.db.models import Count
 from datetime import timedelta
 from rest_framework.generics import  get_object_or_404
-from django.core.cache import cache
 from ..serializers import GenerateQuestionSerializer,TestResultSerializer,TestResults
 '''
 Класс реализует систему тестов в системе, а именно: 
@@ -24,27 +21,22 @@ class GenerateQuestions(APIView):
     # Метод возвращает результаты (доступно только админу)
     def get_result(request):
         # Проверка токена (ТОКЕН НЕ МЕНЯТЬ)
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': 'e164ab1c3e19d899b2d62f2ee3515fbae7d6e481'})
-        token_get =  resp.request.headers['Token']
-        tokens_set = Token.objects.filter(key=token_get)
-        if not tokens_set:
-            help.log_check()
-            logger.error("Токен '{}' не существует".format(token_get))
-            return ("Токен не действителен")
-        else:
+        token = "e164ab1c3e19d899b2d62f2ee3515fbae7d6e481"
+        tocken_result =  help.tocken_check(token)
+        if tocken_result[0] == True:
             test_result_data = TestResults.objects.all()
             serializer = TestResultSerializer(test_result_data, many=True)
             help.log_check()
             logger.debug("Результаты получены")
             return serializer.data
+        else:
+            return tocken_result
    
 
     # Метод возвращает лучшего прошедшего тест
     def get_winner(request):
         # Создание "контейнера для матрицы"
         main_matrix = []
-
-        
         big_matrix = []
         all_test_results = TestResults.objects.all()
         test_result_index = 0
@@ -121,17 +113,10 @@ class GenerateQuestions(APIView):
 
     # Метод возвращает сгенерированные вопросы и записывает их без результата в бд
     def get_and_post_questions(request):
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': 'e164ab1c3e19d899b2d62f2ee3515fbae7d6e481'})
-        token_get =  resp.request.headers['Token']
-        tokens_set = Token.objects.filter(key=token_get)
-        if not tokens_set:
-            help.log_check()
-            logger.error("Токен '{}' не существует".format(token_get))
-            return ("Токен не действителен")
-        else:
-            token_user_id = tokens_set.values('user_id')
-            first_orb_tocken = token_user_id.first()
-            id_user =  first_orb_tocken.get('user_id')
+        token = "0b027cb20327469e8229e48a4fca5f77bc073c69"
+        tocken_result =  help.tocken_check(token)
+        if tocken_result[0] == True:
+            id_user = tocken_result[1]
             user_data = CustomUser.objects.get(id=id_user)
             group_info = GroupPerson.objects.filter(Name_Group = user_data.person_group)
             group_factor = group_info.values()
@@ -160,69 +145,74 @@ class GenerateQuestions(APIView):
             if serializer_test.is_valid(raise_exception=True):
                 person_save = serializer_test.save()
             return serializer_question.data
-            
-    def put_answer_result(request,pk):
-        user_list = {}
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': '0b027cb20327469e8229e48a4fca5f77bc073c69'})
-        token_get =  resp.request.headers['Token']
-        tokens_set = Token.objects.filter(key=token_get)
-        token_user_id = tokens_set.values('user_id')
-        first_orb_tocken = token_user_id.first()
-        id_user =  first_orb_tocken.get('user_id')
-        user = CustomUser.objects.get(id = id_user)
-        answers_api = request.data.get('answers_api')
-
-        answers_result_iter = 0
-        answer_list = []
-        # Проверки вопросов
-        for i in answers_api:
-            quest_id = answers_api[answers_result_iter]
-            quest =quest_id['id']
-            quest_one = QuestionsPull.objects.get(id = quest)
-            if quest_one.answer==quest_id['answer']:
-                quest_factor = quest_one.factor
-                answer_list.append(True)
-            else:
-                answer_list.append(False)
-            answers_result_iter = answers_result_iter+1
-        user_list['test_answers'] = answer_list
-        # Проверка оценки
-        factor_anser_iter = 0
-        factor_answer_list = []
-        for i in answers_api:
-            quest_id = answers_api[factor_anser_iter]
-            quest =quest_id['id']
-            quest_one = QuestionsPull.objects.get(id = quest)
-            if quest_one.answer==quest_id['answer']:
-                quest_factor = quest_one.factor
-                factor_answer_list.append(quest_factor)
-            factor_anser_iter = factor_anser_iter+1
-        mark = sum(factor_answer_list)
-        user_list['test_sum_factor'] = int(mark)
-        # Проверка на "сдал/не сдал"
-        # Получение проходного балла
-        group_info = GroupPerson.objects.filter(Name_Group = user.person_group)
-        group_factor = group_info.values()
-        pass_factor = group_factor[0]['pass_test_factor']
-        # Получение времени начаал теста
-        test_info = TestResults.objects.filter(id = pk)
-        test_info = test_info.values()
-        time_begin_info = test_info[0]['test_time_begin']
-        date_end =  datetime.datetime.now()
-        time_now = date_end.strftime('%H:%M')
-        # Вычисление разницы
-        time_rec = datetime.datetime.now() - timedelta(minutes=2)
-        time_recsf = time_rec.strftime('%H:%M')
-        print(type(time_begin_info))
-        print(type(time_recsf))
-        user_list['test_time_end'] = time_now
-        # Контрольная проверка на результат
-        if pass_factor <=  mark and str(time_begin_info)>=time_recsf:
-            user_list['test_result'] = "Pass"
         else:
-            user_list['test_result'] = "Failed"
-        test_result_save = get_object_or_404(TestResults.objects.all(), pk=pk)
-        serializer = TestResultSerializer(instance=test_result_save, data=user_list, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            person_save = serializer.save()
-        return answer_list
+            help.log_check()
+            logger.error("Токен '{}' не существует".format(token))
+            return tocken_result
+            
+            
+            
+    def put_answer_result(request,pk): 
+        user_list = {}
+        token = "0b027cb20327469e8229e48a4fca5f77bc073c69"
+        tocken_result =  help.tocken_check(token)
+        if tocken_result[0] == True:
+            id_user = tocken_result[1]
+            user = CustomUser.objects.get(id = id_user)
+            answers_api = request.data.get('answers_api')
+            answers_result_iter = 0
+            answer_list = []
+            # Проверки вопросов
+            for i in answers_api:
+                quest_id = answers_api[answers_result_iter]
+                quest =quest_id['id']
+                quest_one = QuestionsPull.objects.get(id = quest)
+                if quest_one.answer==quest_id['answer']:
+                    quest_factor = quest_one.factor
+                    answer_list.append(True)
+                else:
+                    answer_list.append(False)
+                answers_result_iter = answers_result_iter+1
+            user_list['test_answers'] = answer_list
+            # Проверка оценки
+            factor_anser_iter = 0
+            factor_answer_list = []
+            for i in answers_api:
+                quest_id = answers_api[factor_anser_iter]
+                quest =quest_id['id']
+                quest_one = QuestionsPull.objects.get(id = quest)
+                if quest_one.answer==quest_id['answer']:
+                    quest_factor = quest_one.factor
+                    factor_answer_list.append(quest_factor)
+                factor_anser_iter = factor_anser_iter+1
+            mark = sum(factor_answer_list)
+            user_list['test_sum_factor'] = int(mark)
+            # Проверка на "сдал/не сдал"
+            # Получение проходного балла
+            group_info = GroupPerson.objects.filter(Name_Group = user.person_group)
+            group_factor = group_info.values()
+            pass_factor = group_factor[0]['pass_test_factor']
+            # Получение времени начаал теста
+            test_info = TestResults.objects.filter(id = pk)
+            test_info = test_info.values()
+            time_begin_info = test_info[0]['test_time_begin']
+            date_end =  datetime.datetime.now()
+            time_now = date_end.strftime('%H:%M')
+            # Вычисление разницы
+            time_rec = datetime.datetime.now() - timedelta(minutes=2)
+            time_recsf = time_rec.strftime('%H:%M')
+            print(type(time_begin_info))
+            print(type(time_recsf))
+            user_list['test_time_end'] = time_now
+            # Контрольная проверка на результат
+            if pass_factor <=  mark and str(time_begin_info)>=time_recsf:
+                user_list['test_result'] = "Pass"
+            else:
+                user_list['test_result'] = "Failed"
+            test_result_save = get_object_or_404(TestResults.objects.all(), pk=pk)
+            serializer = TestResultSerializer(instance=test_result_save, data=user_list, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                person_save = serializer.save()
+            return answer_list
+        else:
+            return tocken_result

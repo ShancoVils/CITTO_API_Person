@@ -1,3 +1,4 @@
+from django.db.models.fields import CharField
 from rest_framework import serializers
 from .models import CustomUser,TestResults
 # from .models import DetailedTestResult as dtr
@@ -7,7 +8,9 @@ from .models import CustomUser,TestResults
 class CustomUserSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only = True)
     email = serializers.CharField(max_length=120)
-    fio = serializers.CharField()
+    first_name = serializers.CharField()
+    namej = serializers.CharField()
+    last_name = serializers.CharField()
     official = serializers.CharField()
     person_group_id = serializers.IntegerField()
     activate_code = serializers.CharField(write_only=True)
@@ -21,9 +24,9 @@ class CustomUserSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.email = validated_data.get('email', instance.email)
         instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.name = validated_data.get('name', instance.name)
+        instance.namej = validated_data.get('namej', instance.namej)
         instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.Official = validated_data.get('Official', instance.Official)
+        instance.official = validated_data.get('official', instance.official)
         instance.person_group_id = validated_data.get('person_group_id', instance.person_group_id)
         instance.save()
         return instance

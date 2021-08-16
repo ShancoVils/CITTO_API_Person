@@ -10,6 +10,7 @@ import requests
 from ..logs import logger
 from .Hepler_class import Helper as help
 from .UserAutentificate import SendAuthEmail
+
 # Метод получает все данные о пользователях
 
 class PersonView(APIView):
@@ -37,32 +38,25 @@ class PersonView(APIView):
         return email
 
     def put_person_data(request, pk):
-            resp = requests.get('http://127.0.0.1:8000', headers={'Token': '2f869396dfa524f9e1319961480ee3fa056638ea'})
-            token_get =  resp.request.headers['Token']
-            tokens_set = Token.objects.filter(key=token_get)
-            if not tokens_set:
+        token = "0b027cb20327469e8229e48a4fca5f77bc073c69"
+        tocken_result =  help.tocken_check(token)
+        if tocken_result[0] == True:
+            id_user = tocken_result[1]
+            CustomUser.objects.filter(id =id_user)
+            main_id=pk
+            if  id_user != main_id:
                 help.log_check()
-                logger.error("Токен '{}' не существует".format(token_get))
-                return ("Токен не действителен")
+                logger.error("Не достаточно прав для редактирование аккаунта")
+                return ("Не достаточно прав ")
             else:
-                token_user_id = tokens_set.values('user_id')
-                first_orb_tocken =  token_user_id.first()
-                id_user =  first_orb_tocken.get('user_id')
-                CustomUser.objects.filter(id =id_user)
-                main_id=pk
-                if  id_user != main_id:
+                person_save = get_object_or_404(CustomUser.objects.all(), pk=pk)
+                data = request.data.get('person_api')
+                serializer = CustomUserSerializer(instance=person_save, data=data, partial=True)
+                if serializer.is_valid(raise_exception=True):
+                    personal_save = serializer.save()
                     help.log_check()
-                    logger.error("Не достаточно прав для редактирование аккаунта")
-                    return ("Не достаточно прав ")
-                else:
-                    person_save = get_object_or_404(CustomUser.objects.all(), pk=pk)
-                    data = request.data.get('person_api')
-                    serializer = CustomUserSerializer(instance=person_save, data=data, partial=True)
-                    if serializer.is_valid(raise_exception=True):
-                        personal_save = serializer.save()
-                        help.log_check()
-                        logger.debug("Профиль пользователя '{}' обновлен".format(personal_save.email))
-                    return ("Челик {} обновился ".format(personal_save.email))
+                    logger.debug("Профиль пользователя '{}' обновлен".format(personal_save.email))
+                return ("Челик {} обновился ".format(personal_save.email))
 
     def delete_person_data(pk):
         person_obj = get_object_or_404(CustomUser.objects.all(), pk=pk)
