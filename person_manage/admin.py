@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.admin.options import ModelAdmin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser, GroupPerson,QuestionsPull,TestResults,DetailedTestResult
+from .models import CustomUser, GroupPerson,QuestionsPull, TestResults
 
 class ActiveteUserFilter(admin.SimpleListFilter):
     title = ('Активирован')
@@ -43,7 +43,7 @@ class CustomUserAdmin(UserAdmin):
 
 class TestQuestionsAdmin(ModelAdmin):
     model = QuestionsPull
-    list_display = ('question','answer','factor','data_created','data_update',)
+    list_display = ('question','answer','factor','data_created','data_update')
     fieldsets = (
         (None, {'fields': ('question','answer','factor',)}),
     )
@@ -64,25 +64,16 @@ class GroupAdmin(ModelAdmin):
     ordering = ('Name_Group','max_test_factor','pass_test_factor')
     read_only = ('data_created','data_update')
 
-# Форма для админ-панели отображающая модель "Результаты тестирования"
+#Форма для админ-панели отображающая модель "Результаты тестирования"
 
 class TestingAdmin(ModelAdmin):
     model = TestResults
-    list_display = ('tested_user','test_result','test_mark')
+    list_display = ('id','tested_user','test_questions','test_answers','test_sum_factor','test_result','test_time_begin','test_time_end')
     search_fields = ('tested_user',)
-    ordering = ('tested_user','test_result','test_mark')
-    read_only = ('tested_user','test_result','test_mark')
+    ordering = ('tested_user','test_questions','test_answers')
+    read_only = ('tested_user','test_questions','test_answers')
 
 
-
-# Форма для админ-панели отображающая модель "Детальные результаты тестирования"
-
-class DetailedTestResultAdmin(ModelAdmin):
-    model = DetailedTestResult
-    list_display = ('test_number','question','factor','qustion_result')
-    search_fields = ('test_number',)
-    ordering = ('test_number',)
-    read_only = ('test_number','question','qustion_result','factor')
 
 
 # Зарегистрированные модели
@@ -91,4 +82,3 @@ admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(GroupPerson, GroupAdmin)
 admin.site.register(QuestionsPull,TestQuestionsAdmin)
 admin.site.register(TestResults,TestingAdmin)
-admin.site.register(DetailedTestResult,DetailedTestResultAdmin)

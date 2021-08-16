@@ -7,7 +7,8 @@ from django.db.models.fields.related import ForeignKey
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from requests.api import delete
-
+from .managers import CustomUserManager
+import datetime
 OFFICIAL_LIST =(
     ("1", "Уборщик"),
     ("2", "Охранник"),
@@ -43,11 +44,12 @@ class GroupPerson(models.Model):
 
 '''       
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    objects = CustomUserManager()
     first_name = models.CharField(_('Фамилия'),max_length=30,blank=True)
     namej = models.CharField(_('Имя'),max_length=30,blank=True)
     last_name = models.CharField(_('Отчество'),max_length=30,blank=True)
     email = models.EmailField(_('Почта'), unique=True)
-    official = models.CharField(_('Должность'),max_length=1, choices=OFFICIAL_LIST)
+    official = models.CharField(_('Должность'),max_length=1, choices=OFFICIAL_LIST, default=1)
     is_staff = models.BooleanField(_('Админ'),default=False)
     is_active = models.BooleanField(_('Активирован'),default=False)
     data_created = models.DateTimeField(_('Дата создания'),default=timezone.now)
@@ -56,10 +58,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     token_data = models.CharField(_('Токен'),max_length=255,blank=True)
     activate_code = models.CharField(_('Код активации'),max_length=255,blank=True)
     person_group = ForeignKey(GroupPerson, on_delete=CASCADE, verbose_name="Отдел")
-    fio = models.CharField(_('Токен'),max_length=255, blank=True)
+    fio = models.CharField(_('ФИО'),max_length=255, blank=True)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-         update_fields=None):
+    def save(self):
         if not self.fio:
            self.fio = f"{self.first_name} {self.last_name}  {self.namej}"
         return super(CustomUser, self).save()
@@ -86,32 +87,20 @@ class QuestionsPull(models.Model):
 
 '''
 
-Класс создает модель "Тестирование". Вопосы заносятся в бд автоматически.
+ Класс создает модель "Тестирование". Вопосы заносятся в бд автоматически.
 
-'''
+ '''
 class TestResults(models.Model):
     tested_user = models.ForeignKey(CustomUser, on_delete=CASCADE, verbose_name="Пользователь")
-    test_result = models.FloatField(_('Результат'),)
-    test_mark = models.CharField(_('Оценка'),max_length=15, default="gg")
+    test_questions = models.JSONField(_('Вопросы'),max_length=255)
+    test_answers = models.JSONField(_('Ответы'),max_length=255,null=True, blank=True)
+    test_sum_factor = models.IntegerField(_('Результат'),null=True, blank=True)
+    test_result = models.CharField(_('Итог'),max_length=255,null=True, blank=True)
+    test_time_begin = models.TimeField(_('Время начала теста'),null=True, blank=True)
+    test_time_end = models.TimeField(_('Время конца теста'),null=True, blank=True)
 
-    def __str__(self):
-        gg = str(self.id)
-        return gg
 
     class Meta:
         verbose_name_plural = "Тестирование"
-            
-'''
-
-Класс создает модель "Детальные результаты тестов". Модель заполняется автоматически.
 
 
-'''
-class DetailedTestResult(models.Model):
-    test_number = models.ForeignKey(TestResults, on_delete=CASCADE, verbose_name="Номер теста", related_name='test_detail',)
-    question = models.CharField(max_length=255)
-    factor = models.FloatField(_('Коэффициент'),)
-    qustion_result = models.CharField(max_length=10)
-    class Meta:
-        verbose_name_plural = "Детальные результаты тестов"
-        

@@ -8,7 +8,6 @@ from .service.GenerateExcelFile import GenerateExcelFile
 from .service.PersonApiFunctional import PersonView as api
 from .service.UserAutentificate import ActivateCodeForm
 from .service.GenerateQuestions import GenerateQuestions
-
 '''
 Класс реализует основной функционал API и стандартные методы GET,PUT, POST, DELETE
 
@@ -67,19 +66,6 @@ def activate_user(request, random_code):
     ActivateCodeForm(random_code)
     return HttpResponse("Пользователь акивирован")
 
-# Метод получает пулл вопросов. Сложность и количество вопросов зависят от должности
-
-@api_view(['GET'])
-def api_get_questions(request):
-    question_pull =  GenerateQuestions.get_question(request)
-    return Response({"Вопросы": question_pull})
-
-# Метод отправляет на проверку ответы, которые ввел пользователь, и выдает результат
-
-@api_view(['POST'])
-def api_post_answers(request):
-    answers_pull =  GenerateQuestions.post_answer(request)
-    return Response({"Ваш результат": answers_pull})
 
 '''
 Метод получает всех данные всех пользователей прошедших тест,
@@ -97,4 +83,20 @@ def api_get_results(request):
 def get_winner(request):
     results_data =  GenerateQuestions.get_winner(request)
     return Response({"Победитель": results_data})
+
+# # Метод генерирует вопросы, и одновременно с этим делает запись о начале теста пользователя
+
+@api_view(['POST'])
+def api_get_and_post_questions(request):
+    questions_pull =  GenerateQuestions.get_and_post_questions(request)
+    return Response({"Вопросы": questions_pull})
+
+# # Метод обновляет таблицы тестированя добавляя результаты
+
+@api_view(['PUT'])
+def put_answer_result(request,pk):
+    questions_pull =  GenerateQuestions.put_answer_result(request,pk)
+    return Response({"Результат": questions_pull})
+
+
 

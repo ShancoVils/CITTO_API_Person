@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import CustomUser,TestResults
-from .models import DetailedTestResult as dtr
+# from .models import DetailedTestResult as dtr
 
 # Сериалайзер для создания и просмотра и изменения данных пользователей
 
@@ -36,43 +36,26 @@ class GenerateQuestionSerializer(serializers.Serializer):
     answer = serializers.CharField()
     factor = serializers.FloatField()
 
-# Сериалайзер для создания детальных результатов тестирования
-
-class DetailedTestResultSerializer(serializers.Serializer):
-    test_number_id = serializers.IntegerField()
-    test_number = serializers.IntegerField(read_only = True)
-    question = serializers.CharField()
-    qustion_result = serializers.CharField()
-    factor = serializers.FloatField()
-
-    def create(self, validated_data):
-        return dtr.objects.create(**validated_data)
-
-# Сериалайзер для просмотра детальных результатов тестирования
-
-class DetailedTestResultView(serializers.ModelSerializer):
-    class Meta:
-        model = dtr
-        fields = ['question','qustion_result',]
-
-# Сериалайзер для просмотра результатов тестирования всех пользователей
-
-class TestResultSerializerView(serializers.ModelSerializer):
-    tested_user = serializers.CharField(read_only = True)
-    test_detail = DetailedTestResultView(read_only=True, many=True)
-    class Meta:
-        model = TestResults
-        fields = ['id','tested_user','test_result','test_mark','test_detail']
-        depth  = 1
-
-#Сериалайзер для создания результатов тестирования всех пользователей
+# #Сериалайзер для создания результатов тестирования всех пользователей
 
 class TestResultSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only = True)
     tested_user = serializers.CharField(read_only = True)
-    test_result = serializers.FloatField()
-    test_mark = serializers.CharField()
+    test_questions = serializers.JSONField()
+    test_answers = serializers.JSONField(required = False)
+    test_sum_factor = serializers.IntegerField(required = False)
+    test_result = serializers.CharField(required = False)
     tested_user_id = serializers.IntegerField(write_only = True)
+    test_time_begin = serializers.TimeField()
+    test_time_end = serializers.TimeField(required = False)
 
     def create(self, validated_data):
         return TestResults.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.test_answers = validated_data.get('test_answers', instance.test_answers)
+        instance.test_sum_factor = validated_data.get('test_sum_factor', instance.test_sum_factor)
+        instance.test_result = validated_data.get('test_result', instance.test_result)
+        instance.test_time_end = validated_data.get('test_time_end', instance.test_time_end)
+        instance.save()
+        return instance
