@@ -1,13 +1,16 @@
-from ..models import GroupPerson, QuestionsPull, CustomUser, TestResults,DetailedTestResult as dtr
+from os import times
+from ..models import GroupPerson, QuestionsPull, CustomUser, TestResults
 from .GenerateQuestionSet import GenerateQuestionsSet as gqs
-from ..serializers import GenerateQuestionSerializer,TestResultSerializer,DetailedTestResultSerializer,TestResultSerializerView
 from rest_framework.authtoken.models import Token
 from .Hepler_class import Helper as help
 from ..logs import logger
 from rest_framework.views import APIView
-import requests
+import requests, datetime
 from django.db.models import Count
-
+from datetime import timedelta
+from rest_framework.generics import  get_object_or_404
+from django.core.cache import cache
+from ..serializers import GenerateQuestionSerializer,TestResultSerializer,TestResults
 '''
 Класс реализует систему тестов в системе, а именно: 
 Генерация вопросов, проверка ответов, получение результатов
@@ -15,11 +18,110 @@ from django.db.models import Count
 прошел тест лучше всего
 
 '''
-class GenerateQuestions(APIView):
-    #Метод генерирует пулл вопросов
-    def get_question(request):
-        #Проверка на токен
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': 'd94c3ce10d6850d880fc325b64f9a3c90734f1da'})
+class GenerateQuestions(APIView): 
+
+
+    # Метод возвращает результаты (доступно только админу)
+    def get_result(request):
+        # Проверка токена (ТОКЕН НЕ МЕНЯТЬ)
+        resp = requests.get('http://127.0.0.1:8000', headers={'Token': 'e164ab1c3e19d899b2d62f2ee3515fbae7d6e481'})
+        token_get =  resp.request.headers['Token']
+        tokens_set = Token.objects.filter(key=token_get)
+        if not tokens_set:
+            help.log_check()
+            logger.error("Токен '{}' не существует".format(token_get))
+            return ("Токен не действителен")
+        else:
+            test_result_data = TestResults.objects.all()
+            serializer = TestResultSerializer(test_result_data, many=True)
+            help.log_check()
+            logger.debug("Результаты получены")
+            return serializer.data
+   
+
+    # Метод возвращает лучшего прошедшего тест
+    def get_winner(request):
+        # Создание "контейнера для матрицы"
+        main_matrix = []
+
+        
+        big_matrix = []
+        all_test_results = TestResults.objects.all()
+        test_result_index = 0
+        # Основной цикл, количество итерация зависит от количества прошедших тест
+        for i in range(len(all_test_results)):
+            final_list = []
+            user_result_list = []
+            test_user_data = all_test_results.values()
+            test_user_data = test_user_data[test_result_index]
+            test_user_data = test_user_data.values()
+
+            id_user = list(test_user_data)[1]
+            id_quest_vall = list(test_user_data)[2]
+            answer_test = list(test_user_data)[3]
+
+            user_quest_check_list = list(zip(id_quest_vall, answer_test))
+            user_result_list.append(id_user)
+            user_result_list.append(user_quest_check_list)
+            final_list.append(id_user)
+
+            false_quest_id = []
+            true_quest_id = []
+            iter_answer = 0
+            for i in range(len(user_quest_check_list)):
+                if user_quest_check_list[iter_answer][1] == True:
+                    true_quest_id.append(user_quest_check_list[iter_answer][0])
+                    iter_answer+=1
+                elif user_quest_check_list[iter_answer][1] == False:
+                    false_quest_id.append(user_quest_check_list[iter_answer][0])
+                    iter_answer+=1
+            
+            true_factor = []
+            iter_test = 0
+            for i in range(len(true_quest_id)):
+                all_quest_factor = QuestionsPull.objects.filter(id=true_quest_id[iter_test])
+                quest_factor_data = all_quest_factor.values()
+                quest_factor_data = quest_factor_data[0].values()
+                factor_answer = list(quest_factor_data)[5]
+                true_factor.append(factor_answer)
+                iter_test +=1
+
+            false_factor = []
+            iter_test = 0
+            for i in range(len(false_quest_id)):
+                all_quest_factor = QuestionsPull.objects.filter(id=false_quest_id[iter_test])
+                quest_factor_data = all_quest_factor.values()
+                quest_factor_data = quest_factor_data[0].values()
+                factor_answer = list(quest_factor_data)[5]
+                false_factor.append(factor_answer)
+                iter_test +=1
+                
+            best_factor = float(sum(true_factor))-float(sum(false_factor))
+            big_matrix.append(best_factor)
+
+            final_list.append(best_factor)
+            main_matrix.append(final_list)
+            test_result_index+=1
+        # print(true_quest_id)
+        # print(false_quest_id)
+        # print(quest_factor_data)
+        # print(true_factor)
+        # print(false_factor)
+        print(main_matrix)
+        winner_i = 0
+        for i in range(len(main_matrix)):
+            if main_matrix[winner_i][1] == (max(big_matrix)):
+                winner_id = main_matrix[winner_i][0]
+                winner_i+=1
+            else:
+                winner_i+=1
+        print (winner_id)
+        return (winner_id)
+
+
+    # Метод возвращает сгенерированные вопросы и записывает их без результата в бд
+    def get_and_post_questions(request):
+        resp = requests.get('http://127.0.0.1:8000', headers={'Token': 'e164ab1c3e19d899b2d62f2ee3515fbae7d6e481'})
         token_get =  resp.request.headers['Token']
         tokens_set = Token.objects.filter(key=token_get)
         if not tokens_set:
@@ -35,15 +137,33 @@ class GenerateQuestions(APIView):
             group_factor = group_info.values()
             max_factor = group_factor[0]['max_test_factor']
             question_pull = gqs.get_question_set(request, max_factor)
-            serializer = GenerateQuestionSerializer(question_pull, many = True)
+            serializer_question = GenerateQuestionSerializer(question_pull, many = True)
             help.log_check()
             logger.debug("Вопросы получены")
-            return serializer.data
-    # Метод передает ответы
-    def post_answer(request):
-        # Проверка токена
+
+
+            # Занесение списка вопросов в бд'
+            id_quest_list_iter = 0
+            user_quest_dict = {}
+            user_quest_dict['tested_user_id'] = id_user
+            all_question_id_list = []
+            for i in range(len(question_pull)):
+                quest_id = question_pull[id_quest_list_iter]
+                quest =quest_id.id
+                all_question_id_list.append(quest)
+                id_quest_list_iter = id_quest_list_iter+1
+            user_quest_dict['test_questions'] = all_question_id_list
+            date = datetime.datetime.now()
+            time_now = date.strftime('%H:%M')
+            user_quest_dict['test_time_begin'] = time_now
+            serializer_test = TestResultSerializer(data=user_quest_dict)
+            if serializer_test.is_valid(raise_exception=True):
+                person_save = serializer_test.save()
+            return serializer_question.data
+            
+    def put_answer_result(request,pk):
         user_list = {}
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': '2f869396dfa524f9e1319961480ee3fa056638ea'})
+        resp = requests.get('http://127.0.0.1:8000', headers={'Token': '0b027cb20327469e8229e48a4fca5f77bc073c69'})
         token_get =  resp.request.headers['Token']
         tokens_set = Token.objects.filter(key=token_get)
         token_user_id = tokens_set.values('user_id')
@@ -51,147 +171,58 @@ class GenerateQuestions(APIView):
         id_user =  first_orb_tocken.get('user_id')
         user = CustomUser.objects.get(id = id_user)
         answers_api = request.data.get('answers_api')
-        id_answer = 0
-        mark_list = []
+
+        answers_result_iter = 0
+        answer_list = []
         # Проверки вопросов
         for i in answers_api:
-            quest_id = answers_api[id_answer]
+            quest_id = answers_api[answers_result_iter]
             quest =quest_id['id']
             quest_one = QuestionsPull.objects.get(id = quest)
             if quest_one.answer==quest_id['answer']:
                 quest_factor = quest_one.factor
-                mark_list.append(quest_factor)
-            id_answer = id_answer+1
-        mark = sum(mark_list)
-        # Проверка на "сдал/не сдал"
-        user_list['test_result'] = mark
-        user_list['tested_user_id'] = id_user
-        group_info = GroupPerson.objects.filter(Name_Group = user.person_group)
-        group_factor = group_info.values()
-        pass_factor = group_factor[0]['pass_test_factor']
-        if pass_factor <=  mark:
-            user_list['test_mark'] = "Pass"
-        else:
-            user_list['test_mark'] = "Failed"
-        serializer = TestResultSerializer(data=user_list)
-        if serializer.is_valid(raise_exception=True):
-            person_save = serializer.save()
-
-
-        user_result_list = {}
-        id_res_ans = 0
-        test_id = TestResults.objects.get(tested_user = id_user)
-        for i in  answers_api:
-            quest_id = answers_api[id_res_ans]
+                answer_list.append(True)
+            else:
+                answer_list.append(False)
+            answers_result_iter = answers_result_iter+1
+        user_list['test_answers'] = answer_list
+        # Проверка оценки
+        factor_anser_iter = 0
+        factor_answer_list = []
+        for i in answers_api:
+            quest_id = answers_api[factor_anser_iter]
             quest =quest_id['id']
             quest_one = QuestionsPull.objects.get(id = quest)
             if quest_one.answer==quest_id['answer']:
-               user_result_list['test_number_id'] = test_id.id
-               user_result_list['question'] = quest_one.question
-               user_result_list['factor'] = quest_one.factor
-               user_result_list['qustion_result'] = "Верно"
-            else:
-                user_result_list['test_number_id'] = test_id.id
-                user_result_list['question'] = quest_one.question
-                user_result_list['factor'] = quest_one.factor
-                user_result_list['qustion_result'] = "Не верно"
-            id_res_ans = id_res_ans+1
-            serializer = DetailedTestResultSerializer(data=user_result_list)
-            if serializer.is_valid(raise_exception=True):
-                person_save = serializer.save()
-        return mark
-    # Метод возвращает результаты (доступно только админу)
-    def get_result(request):
-        # Проверка токена (ТОКЕН НЕ МЕНЯТЬ)
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': '2f869396dfa524f9e1319961480ee3fa056638ea'})
-        token_get =  resp.request.headers['Token']
-        tokens_set = Token.objects.filter(key=token_get)
-        if not tokens_set:
-            help.log_check()
-            logger.error("Токен '{}' не существует".format(token_get))
-            return ("Токен не действителен")
+                quest_factor = quest_one.factor
+                factor_answer_list.append(quest_factor)
+            factor_anser_iter = factor_anser_iter+1
+        mark = sum(factor_answer_list)
+        user_list['test_sum_factor'] = int(mark)
+        # Проверка на "сдал/не сдал"
+        # Получение проходного балла
+        group_info = GroupPerson.objects.filter(Name_Group = user.person_group)
+        group_factor = group_info.values()
+        pass_factor = group_factor[0]['pass_test_factor']
+        # Получение времени начаал теста
+        test_info = TestResults.objects.filter(id = pk)
+        test_info = test_info.values()
+        time_begin_info = test_info[0]['test_time_begin']
+        date_end =  datetime.datetime.now()
+        time_now = date_end.strftime('%H:%M')
+        # Вычисление разницы
+        time_rec = datetime.datetime.now() - timedelta(minutes=2)
+        time_recsf = time_rec.strftime('%H:%M')
+        print(type(time_begin_info))
+        print(type(time_recsf))
+        user_list['test_time_end'] = time_now
+        # Контрольная проверка на результат
+        if pass_factor <=  mark and str(time_begin_info)>=time_recsf:
+            user_list['test_result'] = "Pass"
         else:
-            test_result_data = TestResults.objects.all()
-            serializer = TestResultSerializerView(test_result_data, many=True)
-            help.log_check()
-            logger.debug("Результаты получены")
-            return serializer.data
-    # Метод возвращает лучшего прошедшего тест
-    def get_winner(request):
-        # Создание "контейнера для матрицы"
-        big_matrix = []
-        # Создание списка с проверенными результатами (из них выбирается лучший)
-        best_factor_list = []
-        all_test_num = dtr.objects.all().values('test_number_id').annotate(total=Count('test_number_id')).order_by('test_number_id')
-        test_result_index = 0
-        # Основной цикл, количество итерация зависит от количества прошедших тест
-        for i in range(len(all_test_num)):
-            user_result_list = []
-            user_val = all_test_num[test_result_index]
-            user_val = user_val.values()
-            user_val=list(user_val)[0]
-            # Получаю id и email пользователя для занесения в матрицу
-            id_answer = 0
-            all_quest = dtr.objects.filter(test_number_id = int(user_val)).order_by('factor')
-            user_id_source = TestResults.objects.filter(id = int(user_val))
-            id_quest_list = []
-            user_id = user_id_source.values()
-            user_id=list(user_id)[0]['tested_user_id']
-            user_email_source = CustomUser.objects.filter(id = user_id)
-            user_email = user_email_source.values()
-            user_email=list(user_email)[0]['email']
-            # Добавляю email пользователя в список
-            user_result_list.append(user_email) 
-            # Цикл для получения всех коэфициентов вопросов, на которые ответил пользователь
-            for i in all_quest:
-                question_val = all_quest.values()
-                question_val = question_val[id_answer]
-                question_val = question_val.values()
-                if list(question_val)[4] == "Верно":
-                    question_val=list(question_val)[3]
-                    id_quest_list.append(question_val)
-                    id_answer = id_answer+1
-                else:
-                    id_answer = id_answer+1
-            # Добавляю список коэффиуиентов в список
-            user_result_list.append(id_quest_list)
-
-            # Получаю общий список всех коэффициентов для будующего сравнения
-            id_answer = 0
-            all_quest = QuestionsPull.objects.all().order_by('factor')
-            factor_list = []
-            for i in all_quest:
-                factor_val = all_quest.values()
-                factor_val = factor_val[id_answer]
-                factor_val = factor_val.values()
-                factor_val=list(factor_val)[5]
-                factor_list.append(factor_val)
-                id_answer = id_answer+1
-            # Удаляю повторяющиеся коэффициенты
-            unic_factor_list = list(set(factor_list))
-            # Добавляю  все коэффициенты в список
-            user_result_list.append(unic_factor_list)
-            
-            # Вычесление лучшего прошедшего тест
-            # Создаю список с коэфициентами вопросов, на которые пользователь не ответил
-            wrong_answer_list = [x for x in id_quest_list + unic_factor_list 
-                                if x not in id_quest_list or x not in unic_factor_list]
-            answer_factor = sum(id_quest_list)
-            wrong_factor = sum(wrong_answer_list)
-            # Получаю коэффциент
-            best_factor = float(answer_factor)-float(wrong_factor)
-            # Добавляю коэффициент в основной спсок и список для тестов
-            best_factor_list.append(best_factor)
-            user_result_list.append(best_factor)
-            big_matrix.append(user_result_list)
-            test_result_index = test_result_index + 1
-        # Из общей матрицы считываю каждый элемент, и если он соответствует лучшему коф. то вывожу его
-        winner_i = 0
-        for i in range(len(big_matrix)):
-            big_matrix_elem = big_matrix[winner_i]
-            if big_matrix_elem[3] == (max(best_factor_list)):
-                print("Победил '{}'".format(big_matrix_elem[0]))
-                winner_i = winner_i +1
-            else:
-                winner_i = winner_i +1
-        return (big_matrix_elem[0])
+            user_list['test_result'] = "Failed"
+        test_result_save = get_object_or_404(TestResults.objects.all(), pk=pk)
+        serializer = TestResultSerializer(instance=test_result_save, data=user_list, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            person_save = serializer.save()
+        return answer_list
