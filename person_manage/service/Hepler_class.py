@@ -28,8 +28,8 @@ class Helper():
 
     # Метод проверяет токен на корректность(принимает токен, возвращает id или отказ)
 
-    def tocken_check(token):
-        resp = requests.get('http://127.0.0.1:8000', headers={'Token': token})
+    def tocken_check():
+        resp = requests.get('http://127.0.0.1:8000', headers={'Token': "0b027cb20327469e8229e48a4fca5f77bc073c69"})
         token_get =  resp.request.headers['Token']
         tokens_set = Token.objects.filter(key=token_get)
         if not tokens_set:

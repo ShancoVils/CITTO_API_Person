@@ -1522,3 +1522,9 @@ fgjdgkhdgk2021-08-05 16:17:55,486 - person_logger - DEBUG - Данные получены
 2021-08-16 17:48:23,056 - person_logger - DEBUG - Данные получены
 2021-08-16 17:50:49,117 - person_logger - DEBUG - Данные получены
 2021-08-16 17:54:38,870 - person_logger - DEBUG - Письмо подтверждение отправлено на 'megalaniya@mail.ru' 
+2021-08-16 17:54:39,401 - person_logger - DEBUG - Пользователю  на 'megalaniya@mail.ru' был выдан токен  
+2021-08-16 17:54:39,461 - person_logger - DEBUG - Пользователю  на 'None' был выдан токен  
+2021-08-16 17:54:39,465 - person_logger - DEBUG - Пользователь 'megalaniya@mail.ru' создан (не активирован)
+2021-08-16 17:56:47,463 - person_logger - DEBUG - Результаты получены
+2021-08-17 12:17:46,881 - person_logger - DEBUG - Результаты получены
+2021-08-17 12:58:32,422 - person_logger - DEBUG - Данные получены

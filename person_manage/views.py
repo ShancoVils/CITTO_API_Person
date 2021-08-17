@@ -66,7 +66,6 @@ def activate_user(request, random_code):
     ActivateCodeForm(random_code)
     return HttpResponse("Пользователь акивирован")
 
-
 '''
 Метод получает всех данные всех пользователей прошедших тест,
 а так же детальный результат (доступно только администратору)
@@ -94,7 +93,7 @@ def api_get_and_post_questions(request):
 # # Метод обновляет таблицы тестированя добавляя результаты
 
 @api_view(['PUT'])
-def put_answer_result(request,pk):
+def put_answer_results(request,pk):
     questions_pull =  GenerateQuestions.put_answer_result(request,pk)
     return Response({"Результат": questions_pull})
 

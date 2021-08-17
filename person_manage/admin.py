@@ -6,7 +6,7 @@ from .models import CustomUser, GroupPerson,QuestionsPull, TestResults
 class ActiveteUserFilter(admin.SimpleListFilter):
     title = ('Активирован')
     parameter_name = 'is_active'
-    def lookups(self, request, model_admin):
+    def lookups(self):
            return (
             ('is_active_true', ('Активирован')),
             ('is_active_false', ('Не активирован')),
