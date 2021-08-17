@@ -1,3 +1,4 @@
 2021-08-16 17:54:39,401 - person_logger - DEBUG - Пользователю  на 'megalaniya@mail.ru' был выдан токен  
 2021-08-16 17:54:39,461 - person_logger - DEBUG - Пользователю  на 'None' был выдан токен  
 2021-08-16 17:54:39,465 - person_logger - DEBUG - Пользователь 'megalaniya@mail.ru' создан (не активирован)
+2021-08-16 17:56:47,463 - person_logger - DEBUG - Результаты получены
