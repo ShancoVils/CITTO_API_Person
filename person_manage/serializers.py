@@ -1,7 +1,5 @@
-from django.db.models.fields import CharField
 from rest_framework import serializers
 from .models import CustomUser,TestResults
-# from .models import DetailedTestResult as dtr
 
 # Сериалайзер для создания и просмотра и изменения данных пользователей
 
@@ -39,7 +37,7 @@ class GenerateQuestionSerializer(serializers.Serializer):
     answer = serializers.CharField()
     factor = serializers.FloatField()
 
-# #Сериалайзер для создания и просмотра результатов тестирования
+# Сериалайзер для создания и просмотра результатов тестирования
 
 class TestResultSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only = True)

@@ -4,7 +4,7 @@ from .GenerateQuestionSet import GenerateQuestionsSet as gqs
 from .Hepler_class import Helper as help
 from ..logs import logger
 from rest_framework.views import APIView
-import requests, datetime
+import datetime
 from datetime import timedelta
 from rest_framework.generics import  get_object_or_404
 from ..serializers import GenerateQuestionSerializer,TestResultSerializer,TestResults
@@ -17,12 +17,9 @@ from ..serializers import GenerateQuestionSerializer,TestResultSerializer,TestRe
 '''
 class GenerateQuestions(APIView): 
 
-
     # Метод возвращает результаты (доступно только админу)
     def get_result(request):
-        # Проверка токена (ТОКЕН НЕ МЕНЯТЬ)
-        token = "e164ab1c3e19d899b2d62f2ee3515fbae7d6e481"
-        tocken_result =  help.tocken_check(token)
+        tocken_result =  help.tocken_check()
         if tocken_result[0] == True:
             test_result_data = TestResults.objects.all()
             serializer = TestResultSerializer(test_result_data, many=True)
@@ -94,11 +91,6 @@ class GenerateQuestions(APIView):
             final_list.append(best_factor)
             main_matrix.append(final_list)
             test_result_index+=1
-        # print(true_quest_id)
-        # print(false_quest_id)
-        # print(quest_factor_data)
-        # print(true_factor)
-        # print(false_factor)
         print(main_matrix)
         winner_i = 0
         for i in range(len(main_matrix)):
@@ -113,8 +105,7 @@ class GenerateQuestions(APIView):
 
     # Метод возвращает сгенерированные вопросы и записывает их без результата в бд
     def get_and_post_questions(request):
-        token = "0b027cb20327469e8229e48a4fca5f77bc073c69"
-        tocken_result =  help.tocken_check(token)
+        tocken_result =  help.tocken_check()
         if tocken_result[0] == True:
             id_user = tocken_result[1]
             user_data = CustomUser.objects.get(id=id_user)
@@ -147,46 +138,70 @@ class GenerateQuestions(APIView):
             return serializer_question.data
         else:
             help.log_check()
-            logger.error("Токен '{}' не существует".format(token))
+            logger.error("Токен '{}' не существует")
             return tocken_result
             
-            
-            
+    # Статический метод вычисляет правильность ответов
+    @staticmethod
+    def question_checked(answers_api):
+        answer_list = []
+        answers_result_iter = 0
+        print(type(answers_api))
+        for i in answers_api:
+            quest_id = answers_api[answers_result_iter]
+            quest =quest_id['id']
+            quest_one = QuestionsPull.objects.get(id = quest)
+            if quest_one.answer==quest_id['answer']:
+                quest_factor = quest_one.factor
+                answer_list.append(True)
+            else:
+                answer_list.append(False)
+            answers_result_iter = answers_result_iter+1
+        return answer_list
+
+    # Статический метод вычисляет общий балл по коэфициентам 
+    @staticmethod
+    def mark_check(answers_api):
+        factor_anser_iter = 0
+        factor_answer_list = []
+        for i in answers_api:
+            quest_id = answers_api[factor_anser_iter]
+            quest =quest_id['id']
+            quest_one = QuestionsPull.objects.get(id = quest)
+            if quest_one.answer==quest_id['answer']:
+                quest_factor = quest_one.factor
+                factor_answer_list.append(quest_factor)
+            factor_anser_iter = factor_anser_iter+1
+        mark = sum(factor_answer_list)
+        return mark
+
+    # Статический метод вычисляет общий балл по коэфициентам 
+    @staticmethod
+    def get_test_time(pk):
+        test_info = TestResults.objects.filter(id = pk)
+        test_info = test_info.values()
+        time_begin_info = test_info[0]['test_time_begin']
+        date_end =  datetime.datetime.now()
+        time_now = date_end.strftime('%H:%M')
+        # Вычисление разницы
+        time_diff = datetime.datetime.now() - timedelta(minutes=2)
+        time_diff = time_diff.strftime('%H:%M')
+        return time_begin_info,time_diff,time_now
+
+    # Метод записывает результаты в базу данных
     def put_answer_result(request,pk): 
         # Занесение результатов в бд
         user_list = {}
-        token = "0b027cb20327469e8229e48a4fca5f77bc073c69"
-        tocken_result =  help.tocken_check(token)
+        tocken_result =  help.tocken_check()
         if tocken_result[0] == True:
             id_user = tocken_result[1]
             user = CustomUser.objects.get(id = id_user)
             answers_api = request.data.get('answers_api')
-            answers_result_iter = 0
-            answer_list = []
             # Проверки вопросов
-            for i in answers_api:
-                quest_id = answers_api[answers_result_iter]
-                quest =quest_id['id']
-                quest_one = QuestionsPull.objects.get(id = quest)
-                if quest_one.answer==quest_id['answer']:
-                    quest_factor = quest_one.factor
-                    answer_list.append(True)
-                else:
-                    answer_list.append(False)
-                answers_result_iter = answers_result_iter+1
+            answer_list = GenerateQuestions.question_checked(answers_api)
             user_list['test_answers'] = answer_list
             # Проверка оценки
-            factor_anser_iter = 0
-            factor_answer_list = []
-            for i in answers_api:
-                quest_id = answers_api[factor_anser_iter]
-                quest =quest_id['id']
-                quest_one = QuestionsPull.objects.get(id = quest)
-                if quest_one.answer==quest_id['answer']:
-                    quest_factor = quest_one.factor
-                    factor_answer_list.append(quest_factor)
-                factor_anser_iter = factor_anser_iter+1
-            mark = sum(factor_answer_list)
+            mark = GenerateQuestions.mark_check(answers_api)
             user_list['test_sum_factor'] = int(mark)
             # Проверка на "сдал/не сдал"
             # Получение проходного балла
@@ -194,19 +209,10 @@ class GenerateQuestions(APIView):
             group_factor = group_info.values()
             pass_factor = group_factor[0]['pass_test_factor']
             # Получение времени начала теста
-            test_info = TestResults.objects.filter(id = pk)
-            test_info = test_info.values()
-            time_begin_info = test_info[0]['test_time_begin']
-            date_end =  datetime.datetime.now()
-            time_now = date_end.strftime('%H:%M')
-            # Вычисление разницы
-            time_rec = datetime.datetime.now() - timedelta(minutes=2)
-            time_recsf = time_rec.strftime('%H:%M')
-            print(type(time_begin_info))
-            print(type(time_recsf))
-            user_list['test_time_end'] = time_now
+            test_time_date = GenerateQuestions.get_test_time(pk)
+            user_list['test_time_end'] = test_time_date[2]
             # Контрольная проверка на результат
-            if pass_factor <=  mark and str(time_begin_info)>=time_recsf:
+            if pass_factor <=  mark and str(test_time_date[0])>=test_time_date[1]:
                 user_list['test_result'] = "Pass"
             else:
                 user_list['test_result'] = "Failed"
@@ -217,3 +223,4 @@ class GenerateQuestions(APIView):
             return answer_list
         else:
             return tocken_result
+
