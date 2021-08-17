@@ -23,7 +23,7 @@ class ActiveteUserFilter(admin.SimpleListFilter):
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ('email','fio','official','is_staff', 'is_active','person_group',)
+    list_display = ('id','email','fio','official','is_staff', 'is_active','person_group',)
     list_filter = (ActiveteUserFilter,)
     fieldsets = (
         (None, {'fields': ('email','last_name','namej','first_name','official','password','activate_code','person_group')}),
@@ -43,7 +43,7 @@ class CustomUserAdmin(UserAdmin):
 
 class TestQuestionsAdmin(ModelAdmin):
     model = QuestionsPull
-    list_display = ('question','answer','factor','data_created','data_update')
+    list_display = ('id','question','answer','factor','data_created','data_update')
     fieldsets = (
         (None, {'fields': ('question','answer','factor',)}),
     )
@@ -56,7 +56,7 @@ class TestQuestionsAdmin(ModelAdmin):
 
 class GroupAdmin(ModelAdmin):
     model = GroupPerson
-    list_display = ('Name_Group','max_test_factor','pass_test_factor')
+    list_display = ('id','Name_Group','max_test_factor','pass_test_factor')
     fieldsets = (
         (None, {'fields': ('Name_Group','max_test_factor','pass_test_factor')}),
     )
@@ -64,7 +64,7 @@ class GroupAdmin(ModelAdmin):
     ordering = ('Name_Group','max_test_factor','pass_test_factor')
     read_only = ('data_created','data_update')
 
-#Форма для админ-панели отображающая модель "Результаты тестирования"
+# Форма для админ-панели отображающая модель "Результаты тестирования"
 
 class TestingAdmin(ModelAdmin):
     model = TestResults
@@ -72,9 +72,6 @@ class TestingAdmin(ModelAdmin):
     search_fields = ('tested_user',)
     ordering = ('tested_user','test_questions','test_answers')
     read_only = ('tested_user','test_questions','test_answers')
-
-
-
 
 # Зарегистрированные модели
 

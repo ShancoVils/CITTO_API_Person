@@ -127,7 +127,7 @@ class GenerateQuestions(APIView):
             logger.debug("Вопросы получены")
 
 
-            # Занесение списка вопросов в бд'
+            # Занесение списка вопросов в бд без результатов
             id_quest_list_iter = 0
             user_quest_dict = {}
             user_quest_dict['tested_user_id'] = id_user
@@ -153,6 +153,7 @@ class GenerateQuestions(APIView):
             
             
     def put_answer_result(request,pk): 
+        # Занесение результатов в бд
         user_list = {}
         token = "0b027cb20327469e8229e48a4fca5f77bc073c69"
         tocken_result =  help.tocken_check(token)
@@ -192,7 +193,7 @@ class GenerateQuestions(APIView):
             group_info = GroupPerson.objects.filter(Name_Group = user.person_group)
             group_factor = group_info.values()
             pass_factor = group_factor[0]['pass_test_factor']
-            # Получение времени начаал теста
+            # Получение времени начала теста
             test_info = TestResults.objects.filter(id = pk)
             test_info = test_info.values()
             time_begin_info = test_info[0]['test_time_begin']

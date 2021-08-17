@@ -39,7 +39,7 @@ class GenerateQuestionSerializer(serializers.Serializer):
     answer = serializers.CharField()
     factor = serializers.FloatField()
 
-# #Сериалайзер для создания результатов тестирования всех пользователей
+# #Сериалайзер для создания и просмотра результатов тестирования
 
 class TestResultSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only = True)
